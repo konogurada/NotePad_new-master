@@ -54,8 +54,8 @@ public final class NotePad {
          */
         private static final String SCHEME = "content://";
 
-        /**
-         * Path parts for the URIs
+        /*
+          Path parts for the URIs
          */
 
         /**
@@ -141,13 +141,13 @@ public final class NotePad {
 
         /**
          * Column name for the creation timestamp
-         * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
+         * <P>Type: INTEGER (long from System.currentTimeMillis())</P>
          */
         public static final String COLUMN_NAME_CREATE_DATE = "created";
 
         /**
          * Column name for the modification timestamp
-         * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
+         * <P>Type: INTEGER (long from System.currentTimeMillis())</P>
          */
         public static final String COLUMN_NAME_MODIFICATION_DATE = "modified";
     }

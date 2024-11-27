@@ -38,12 +38,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import java.util.Objects;
+
 /**
  * This Activity handles "editing" a note, where editing is responding to
  * {@link Intent#ACTION_VIEW} (request to view data), edit a note
  * {@link Intent#ACTION_EDIT}, create a note {@link Intent#ACTION_INSERT}, or
  * create a new note from the current contents of the clipboard {@link Intent#ACTION_PASTE}.
- *
+ * <p>
  * NOTE: Notice that the provider operations in this Activity are taking place on the UI thread.
  * This is not a good practice. It is only done here to make the code more readable. A real
  * application should use the {@link android.content.AsyncQueryHandler}
@@ -82,8 +84,8 @@ public class NoteEditor extends Activity {
      * Defines a custom EditText View that draws lines between each line of text that is displayed.
      */
     public static class LinedEditText extends EditText {
-        private Rect mRect;
-        private Paint mPaint;
+        private final Rect mRect;
+        private final Paint mPaint;
 
         // This constructor is used by LayoutInflater
         public LinedEditText(Context context, AttributeSet attrs) {
@@ -108,7 +110,6 @@ public class NoteEditor extends Activity {
 
             // Gets the global Rect and Paint objects
             Rect r = mRect;
-            Paint paint = mPaint;
 
             /*
              * Draws one line in the rectangle for every line of text in the EditText
@@ -123,7 +124,7 @@ public class NoteEditor extends Activity {
                  * at a vertical position one dip below the baseline, using the "paint" object
                  * for details.
                  */
-                canvas.drawLine(r.left, baseline + 1, r.right, baseline + 1, paint);
+                canvas.drawLine(r.left, baseline + 1, r.right, baseline + 1, mPaint);
             }
 
             // Finishes up by calling the parent method
@@ -166,7 +167,7 @@ public class NoteEditor extends Activity {
             // Sets the Activity state to INSERT, gets the general note URI, and inserts an
             // empty record in the provider
             mState = STATE_INSERT;
-            mUri = getContentResolver().insert(intent.getData(), null);
+            mUri = getContentResolver().insert(Objects.requireNonNull(intent.getData()), null);
 
             /*
              * If the attempt to insert the new note fails, shuts down this Activity. The
@@ -240,7 +241,7 @@ public class NoteEditor extends Activity {
     /**
      * This method is called when the Activity is about to come to the foreground. This happens
      * when the Activity comes to the top of the task stack, OR when it is first starting.
-     *
+     * <p>
      * Moves to the first note in the list, sets an appropriate title for the action chosen by
      * the user, puts the note contents into the TextView, and saves the original text as a
      * backup.
@@ -309,7 +310,7 @@ public class NoteEditor extends Activity {
      * This method is called when an Activity loses focus during its normal operation, and is then
      * later on killed. The Activity has a chance to save its state so that the system can restore
      * it.
-     *
+     * <p>
      * Notice that this method isn't a normal part of the Activity lifecycle. It won't be called
      * if the user simply navigates away from the Activity.
      */
@@ -322,13 +323,13 @@ public class NoteEditor extends Activity {
 
     /**
      * This method is called when the Activity loses focus.
-     *
+     * <p>
      * For Activity objects that edit information, onPause() may be the one place where changes are
      * saved. The Android application model is predicated on the idea that "save" and "exit" aren't
      * required actions. When users navigate away from an Activity, they shouldn't have to go back
      * to it to complete their work. The act of going away should save everything and leave the
      * Activity in a state where Android can destroy it if necessary.
-     *
+     * <p>
      * If the user hasn't done anything, then this deletes or clears out the note, otherwise it
      * writes the user's work to the provider.
      */
@@ -377,7 +378,7 @@ public class NoteEditor extends Activity {
     /**
      * This method is called when the user clicks the device's Menu button the first time for
      * this Activity. Android passes in a Menu object that is populated with items.
-     *
+     * <p>
      * Builds the menus for editing and inserting, and adds in alternative actions that
      * registered themselves to handle the MIME types for this application.
      *
@@ -412,11 +413,7 @@ public class NoteEditor extends Activity {
         int colNoteIndex = mCursor.getColumnIndex(NotePad.Notes.COLUMN_NAME_NOTE);
         String savedNote = mCursor.getString(colNoteIndex);
         String currentNote = mText.getText().toString();
-        if (savedNote.equals(currentNote)) {
-            menu.findItem(R.id.menu_revert).setVisible(false);
-        } else {
-            menu.findItem(R.id.menu_revert).setVisible(true);
-        }
+        menu.findItem(R.id.menu_revert).setVisible(!savedNote.equals(currentNote));
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -521,7 +518,7 @@ public class NoteEditor extends Activity {
      * @param text The new note contents to use.
      * @param title The new note title to use
      */
-    private final void updateNote(String text, String title) {
+    private void updateNote(String text, String title) {
 
         // Sets up a map to contain values to be updated in the provider.
         ContentValues values = new ContentValues();
@@ -584,7 +581,7 @@ public class NoteEditor extends Activity {
      * This helper method cancels the work done on a note.  It deletes the note if it was
      * newly created, or reverts to the original text of the note i
      */
-    private final void cancelNote() {
+    private void cancelNote() {
         if (mCursor != null) {
             if (mState == STATE_EDIT) {
                 // Put the original note text back into the database
@@ -605,7 +602,7 @@ public class NoteEditor extends Activity {
     /**
      * Take care of deleting a note.  Simply deletes the entry.
      */
-    private final void deleteNote() {
+    private void deleteNote() {
         if (mCursor != null) {
             mCursor.close();
             mCursor = null;

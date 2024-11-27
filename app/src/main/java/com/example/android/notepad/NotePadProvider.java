@@ -16,8 +16,6 @@
 
 package com.example.android.notepad;
 
-import com.example.android.notepad.NotePad;
-
 import android.content.ClipDescription;
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -44,7 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 /**
@@ -68,12 +66,12 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
     /**
      * A projection map used to select columns from the database
      */
-    private static HashMap<String, String> sNotesProjectionMap;
+    private static final HashMap<String, String> sNotesProjectionMap;
 
     /**
      * A projection map used to select columns from the database
      */
-    private static HashMap<String, String> sLiveFolderProjectionMap;
+    private static final HashMap<String, String> sLiveFolderProjectionMap;
 
     /**
      * Standard projection for the interesting columns of a normal note.
@@ -108,8 +106,8 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
     private DatabaseHelper mOpenHelper;
 
 
-    /**
-     * A block that instantiates and sets static objects
+    /*
+      A block that instantiates and sets static objects
      */
     static {
 
@@ -136,7 +134,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
         // Creates a new projection map instance. The map returns a column name
         // given a string. The two are usually equal.
-        sNotesProjectionMap = new HashMap<String, String>();
+        sNotesProjectionMap = new HashMap<>();
 
         // Maps the string "_ID" to the column name "_ID"
         sNotesProjectionMap.put(NotePad.Notes._ID, NotePad.Notes._ID);
@@ -161,7 +159,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
          */
 
         // Creates a new projection map instance
-        sLiveFolderProjectionMap = new HashMap<String, String>();
+        sLiveFolderProjectionMap = new HashMap<>();
 
         // Maps "_ID" to "_ID AS _ID" for a live folder
         sLiveFolderProjectionMap.put(LiveFolders._ID, NotePad.Notes._ID + " AS " + LiveFolders._ID);
@@ -256,8 +254,8 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
        qb.setTables(NotePad.Notes.TABLE_NAME);
 
-       /**
-        * Choose the projection and adjust the "where" clause based on URI pattern-matching.
+       /*
+         Choose the projection and adjust the "where" clause based on URI pattern-matching.
         */
        switch (sUriMatcher.match(uri)) {
            // If the incoming URI is for notes, chooses the Notes projection
@@ -332,8 +330,8 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
    @Override
    public String getType(Uri uri) {
 
-       /**
-        * Chooses the MIME type based on the incoming URI pattern
+       /*
+         Chooses the MIME type based on the incoming URI pattern
         */
        switch (sUriMatcher.match(uri)) {
 
@@ -372,8 +370,8 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
      */
     @Override
     public String[] getStreamTypes(Uri uri, String mimeTypeFilter) {
-        /**
-         *  Chooses the data stream type based on the incoming URI pattern.
+        /*
+           Chooses the data stream type based on the incoming URI pattern.
          */
         switch (sUriMatcher.match(uri)) {
 
@@ -467,12 +465,10 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
         FileOutputStream fout = new FileOutputStream(output.getFileDescriptor());
         PrintWriter pw = null;
         try {
-            pw = new PrintWriter(new OutputStreamWriter(fout, "UTF-8"));
+            pw = new PrintWriter(new OutputStreamWriter(fout, StandardCharsets.UTF_8));
             pw.println(c.getString(READ_NOTE_TITLE_INDEX));
             pw.println("");
             pw.println(c.getString(READ_NOTE_NOTE_INDEX));
-        } catch (UnsupportedEncodingException e) {
-            Log.w(TAG, "Ooops", e);
         } finally {
             c.close();
             if (pw != null) {
@@ -516,27 +512,27 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
         }
 
         // Gets the current system time in milliseconds
-        Long now = Long.valueOf(System.currentTimeMillis());
+        Long now = System.currentTimeMillis();
 
         // If the values map doesn't contain the creation date, sets the value to the current time.
-        if (values.containsKey(NotePad.Notes.COLUMN_NAME_CREATE_DATE) == false) {
+        if (!values.containsKey(NotePad.Notes.COLUMN_NAME_CREATE_DATE)) {
             values.put(NotePad.Notes.COLUMN_NAME_CREATE_DATE, now);
         }
 
         // If the values map doesn't contain the modification date, sets the value to the current
         // time.
-        if (values.containsKey(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE) == false) {
+        if (!values.containsKey(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE)) {
             values.put(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE, now);
         }
 
         // If the values map doesn't contain a title, sets the value to the default title.
-        if (values.containsKey(NotePad.Notes.COLUMN_NAME_TITLE) == false) {
+        if (!values.containsKey(NotePad.Notes.COLUMN_NAME_TITLE)) {
             Resources r = Resources.getSystem();
             values.put(NotePad.Notes.COLUMN_NAME_TITLE, r.getString(android.R.string.untitled));
         }
 
         // If the values map doesn't contain note text, sets the value to an empty string.
-        if (values.containsKey(NotePad.Notes.COLUMN_NAME_NOTE) == false) {
+        if (!values.containsKey(NotePad.Notes.COLUMN_NAME_NOTE)) {
             values.put(NotePad.Notes.COLUMN_NAME_NOTE, "");
         }
 

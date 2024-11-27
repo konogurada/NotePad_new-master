@@ -16,8 +16,6 @@
 
 package com.example.android.notepad;
 
-import com.example.android.notepad.NotePad;
-
 import android.app.ListActivity;
 import android.content.ClipboardManager;
 import android.content.ClipData;
@@ -43,7 +41,7 @@ import android.widget.SimpleCursorAdapter;
  * Displays a list of notes. Will display notes from the {@link Uri}
  * provided in the incoming Intent if there is one, otherwise it defaults to displaying the
  * contents of the {@link NotePadProvider}.
- *
+ * <p>
  * NOTE: Notice that the provider operations in this Activity are taking place on the UI thread.
  * This is not a good practice. It is only done here to make the code more readable. A real
  * application should use the {@link android.content.AsyncQueryHandler} or
@@ -140,7 +138,7 @@ public class NotesList extends ListActivity {
     /**
      * Called when the user clicks the device's Menu button the first time for
      * this Activity. Android passes in a Menu object that is populated with items.
-     *
+     * <p>
      * Sets up a menu that provides the Insert option plus a list of alternative actions for
      * this Activity. Other applications that want to handle notes can "register" themselves in
      * Android by providing an intent filter that includes the category ALTERNATIVE and the
@@ -180,12 +178,8 @@ public class NotesList extends ListActivity {
         MenuItem mPasteItem = menu.findItem(R.id.menu_paste);
 
         // If the clipboard contains an item, enables the Paste option on the menu.
-        if (clipboard.hasPrimaryClip()) {
-            mPasteItem.setEnabled(true);
-        } else {
-            // If the clipboard is empty, disables the menu's Paste option.
-            mPasteItem.setEnabled(false);
-        }
+        // If the clipboard is empty, disables the menu's Paste option.
+        mPasteItem.setEnabled(clipboard.hasPrimaryClip());
 
         // Gets the number of notes currently being displayed.
         final boolean haveItems = getListAdapter().getCount() > 0;
@@ -287,15 +281,14 @@ public class NotesList extends ListActivity {
     /**
      * This method is called when the user context-clicks a note in the list. NotesList registers
      * itself as the handler for context menus in its ListView (this is done in onCreate()).
-     *
+     * <p>
      * The only available options are COPY and DELETE.
-     *
+     * <p>
      * Context-click is equivalent to long-press.
      *
      * @param menu A ContexMenu object to which items should be added.
      * @param view The View for which the context menu is being constructed.
      * @param menuInfo Data associated with view.
-     * @throws ClassCastException
      */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
@@ -356,7 +349,6 @@ public class NotesList extends ListActivity {
      * @param item The selected menu item
      * @return True if the menu item was DELETE, and no default processing is need, otherwise false,
      * which triggers the default handling of the item.
-     * @throws ClassCastException
      */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
