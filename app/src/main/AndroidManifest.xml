@@ -30,7 +30,9 @@
             <grant-uri-permission android:pathPattern=".*" />
         </provider>
 
-        <activity android:name="NotesList" android:label="@string/title_notes_list">
+        <activity android:name="NotesList"
+            android:exported="true"
+            android:label="@string/title_notes_list">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -50,6 +52,7 @@
         </activity>
 
         <activity android:name="NoteEditor"
+            android:exported="true"
             android:theme="@android:style/Theme.Holo.Light"
             android:screenOrientation="sensor"
             android:configChanges="keyboardHidden|orientation"

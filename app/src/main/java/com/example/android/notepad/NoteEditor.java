@@ -167,7 +167,7 @@ public class NoteEditor extends Activity {
             // Sets the Activity state to INSERT, gets the general note URI, and inserts an
             // empty record in the provider
             mState = STATE_INSERT;
-            mUri = getContentResolver().insert(Objects.requireNonNull(intent.getData()), null);
+            mUri = getContentResolver().insert(intent.getData(), null);
 
             /*
              * If the attempt to insert the new note fails, shuts down this Activity. The
